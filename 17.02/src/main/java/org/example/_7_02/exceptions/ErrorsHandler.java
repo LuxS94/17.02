@@ -31,4 +31,10 @@ public class ErrorsHandler {
 
     }
 
+    @ExceptionHandler(AlreadyExsists.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorsDTO handleBadRequest(AlreadyExsists ex) {
+        return new ErrorsDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
 }

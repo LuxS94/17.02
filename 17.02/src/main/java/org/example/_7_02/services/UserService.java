@@ -3,6 +3,7 @@ package org.example._7_02.services;
 import org.example._7_02.dto.RoleDTO;
 import org.example._7_02.dto.UserDTO;
 import org.example._7_02.entities.User;
+import org.example._7_02.exceptions.AlreadyExsists;
 import org.example._7_02.exceptions.NotFoundException;
 import org.example._7_02.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ public class UserService {
 
     public User save(UserDTO payload) {
         User nUser = new User(payload.username(), payload.email(), payload.password());
+        this.ur.findByEmail(payload.email()).ifPresent(u -> {
+            throw new AlreadyExsists("La mail è già registrata");
+        });
         return this.ur.save(nUser);
     }
 
@@ -41,6 +45,12 @@ public class UserService {
         f.setEmail(payload.email());
         f.setUsername(payload.username());
         f.setPassword(payload.password());
+        this.ur.findByEmail(payload.email()).ifPresent(u -> {
+            throw new AlreadyExsists("La mail è già registrata");
+        });
+        this.ur.findByUsername(payload.username()).ifPresent(u -> {
+            throw new AlreadyExsists("L'username esiste già !");
+        });
         return this.ur.save(f);
     }
 
