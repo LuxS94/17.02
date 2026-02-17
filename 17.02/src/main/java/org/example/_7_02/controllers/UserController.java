@@ -3,12 +3,16 @@ package org.example._7_02.controllers;
 import org.example._7_02.dto.RoleDTO;
 import org.example._7_02.dto.UserDTO;
 import org.example._7_02.entities.User;
+import org.example._7_02.exceptions.ValidationExceptions;
 import org.example._7_02.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -35,8 +39,16 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User save(@RequestBody @Validated UserDTO payload) {
-        return this.us.save(payload);
+    public User save(@RequestBody @Validated UserDTO payload, BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            List<String> errorsList = validationResult.getFieldErrors()
+                    .stream()
+                    .map(fieldError -> fieldError.getDefaultMessage())
+                    .toList();
+            throw new ValidationExceptions(errorsList);
+        } else {
+            return this.us.save(payload);
+        }
     }// http://localhost:3001/users
 
     @PutMapping("/{id}")
