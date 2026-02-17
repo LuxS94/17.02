@@ -37,4 +37,9 @@ public class ErrorsHandler {
         return new ErrorsDTO(ex.getMessage(), LocalDateTime.now());
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED) // 401
+    public ErrorsDTO handleUnauthorized(UnauthorizedException ex) {
+        return new ErrorsDTO(ex.getMessage(), LocalDateTime.now());
+    }
 }
