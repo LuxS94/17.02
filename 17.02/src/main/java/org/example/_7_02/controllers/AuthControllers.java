@@ -29,7 +29,7 @@ public class AuthControllers {
     public LoginResDTO login(@RequestBody LoginDTO body) {
 
         return new LoginResDTO(this.as.checkCredentialsAndGenerateToken(body));
-    }
+    }//http://localhost:3001/auth/login
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
@@ -44,6 +44,6 @@ public class AuthControllers {
             return this.us.save(payload);
         }
 
-    }
+    }//http://localhost:3001/auth/register
 }
 
