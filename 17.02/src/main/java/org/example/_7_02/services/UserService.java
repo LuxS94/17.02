@@ -11,15 +11,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
     private final UserRepo ur;
+    private final PasswordEncoder bcrypt;
 
     @Autowired
-    public UserService(UserRepo ur) {
+    public UserService(UserRepo ur, PasswordEncoder passwordEncoder) {
         this.ur = ur;
+        this.bcrypt = passwordEncoder;
     }
 
     public Page<User> findAll(int page, int size, String orderBy, String sortCriteria) {
@@ -32,8 +35,12 @@ public class UserService {
         return this.ur.findById(id).orElseThrow(() -> new NotFoundException("Utente non trovato"));
     }
 
+    public User findByEmail(String email) {
+        return this.ur.findByEmail(email).orElseThrow(() -> new NotFoundException("La mail non è registrata!"));
+    }
+
     public User save(UserDTO payload) {
-        User nUser = new User(payload.username(), payload.email(), payload.password());
+        User nUser = new User(payload.username(), payload.email(), bcrypt.encode(payload.password()));
         this.ur.findByEmail(payload.email()).ifPresent(u -> {
             throw new AlreadyExsists("La mail è già registrata");
         });
