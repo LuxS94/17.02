@@ -8,6 +8,8 @@ import org.example._7_02.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,7 @@ public class UserController {
         this.us = us;
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @GetMapping
     public Page<User> findAll(@RequestParam(defaultValue = "0") int page,
                               @RequestParam(defaultValue = "20") int size,
@@ -32,6 +35,7 @@ public class UserController {
         return this.us.findAll(page, size, orderBy, sortCriteria);
     }// http://localhost:3001/users
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @GetMapping("/{id}")
     public User FindById(@PathVariable String id) {
         return this.us.findById(id);
@@ -51,19 +55,32 @@ public class UserController {
         }
     }// http://localhost:3001/users
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PutMapping("/{id}")
     public User findByIdAndUpdate(@PathVariable String id, @RequestBody @Validated UserDTO payload) {
         return this.us.findByIdAndUpadte(id, payload);
     }// http://localhost:3001/users/{id}
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(@PathVariable String id) {
         this.us.deleteById(id);
     }// http://localhost:3001/users/{id}
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PatchMapping("/{id}/role")
     public User setRoleById(@PathVariable String id, @RequestBody RoleDTO role) {
         return this.us.setRoleById(id, role);
     }// http://localhost:3001/users/{id}/role
+
+    @PutMapping("/me")
+    public User updateProfile(@AuthenticationPrincipal User currentAuthenticatedUser, @RequestBody UserDTO payload) {
+        return this.us.findByIdAndUpadte(currentAuthenticatedUser.getId(), payload);
+    }// http://localhost:3001/users/me
+
+    @DeleteMapping("/me")
+    public void deleteProfile(@AuthenticationPrincipal User currentAuthenticatedUser) {
+        this.us.deleteById(currentAuthenticatedUser.getId());
+    }// http://localhost:3001/users/me
 }
