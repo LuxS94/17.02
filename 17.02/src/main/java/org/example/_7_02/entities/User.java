@@ -22,6 +22,11 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    public User() {
+    }
+
+    ;
+
     public User(String username, String email, String password) {
         this.id = UUID.randomUUID().toString();
         this.username = username;
