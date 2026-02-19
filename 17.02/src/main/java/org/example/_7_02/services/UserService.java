@@ -47,6 +47,10 @@ public class UserService {
         return this.ur.save(nUser);
     }
 
+    public User findByUsername(String username) {
+        return this.ur.findByUsername(username).orElseThrow(() -> new NotFoundException("L'usename non è registrato"));
+    }
+
     public User findByIdAndUpadte(String id, UserDTO payload) {
         User f = this.findById(id);
         f.setEmail(payload.email());
