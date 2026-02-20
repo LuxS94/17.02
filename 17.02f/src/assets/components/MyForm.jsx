@@ -3,16 +3,17 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import { Link} from 'react-router-dom';
-import MyFormR from './MyFormR';
 import { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 
 
 
 function MyForm() {
-  const [form,setform]=useState({username:'',mail:'',password:''});
-
+  const [form,setform]=useState({username:'',email:'',password:''});
+const navigate = useNavigate();
   const change=(e)=>   setform({...form,[e.target.name]: e.target.value})
-  const logIn=()=>{
+  const logIn=(e)=>{
+    e.preventDefault();
   const url= 'http://localhost:3001/auth/login'
   const token= localStorage.getItem('token')
   fetch(url,{
@@ -21,17 +22,17 @@ function MyForm() {
     body:JSON.stringify(form)
   })
   .then(res=>{if(res.ok){return res.json()} else {throw new Error ("Errore nella res")}})
-  .then(data=>console.log(data))
+  .then(()=>{setform({ email: '', password: '' });navigate('/')})
   .catch(err=>console.log(err))
 } 
-const click= (e)=>e.preventDefault();logIn();
+
   return (
     <div className='d-flex justify-content-center '>
     <Card style={{ width: '18rem' , backgroundColor: 'white' , marginTop: '100px'}}>
-       <Form className='m-3'>
+       <Form onSubmit={logIn} className='m-3'>
       <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Inserisci la tua email</Form.Label>
-        <Form.Control onChange={change}  name='mail' type="email" placeholder="example@mail.com" />
+        <Form.Control onChange={change}  name='email' type="email" placeholder="example@mail.com" />
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="formBasicPassword">
@@ -39,7 +40,7 @@ const click= (e)=>e.preventDefault();logIn();
         <Form.Control onChange={change} name='password' type="password" placeholder="Password" />
       </Form.Group>
       <Form.Label>Non hai un account? <Link to="/signUp">Registrati</Link></Form.Label>
-      <Button onClick={()=>{click();setform({email:'',password:''})}} variant="primary" type="submit">
+      <Button  variant="primary" type="submit">
        Accedi
       </Button>
     </Form>
