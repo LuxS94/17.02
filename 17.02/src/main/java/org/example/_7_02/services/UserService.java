@@ -2,6 +2,7 @@ package org.example._7_02.services;
 
 import org.example._7_02.dto.RoleDTO;
 import org.example._7_02.dto.UserDTO;
+import org.example._7_02.entities.Role;
 import org.example._7_02.entities.User;
 import org.example._7_02.exceptions.AlreadyExsists;
 import org.example._7_02.exceptions.NotFoundException;
@@ -56,12 +57,18 @@ public class UserService {
         f.setEmail(payload.email());
         f.setUsername(payload.username());
         f.setPassword(payload.password());
-        this.ur.findByEmail(payload.email()).ifPresent(u -> {
-            throw new AlreadyExsists("La mail è già registrata");
-        });
-        this.ur.findByUsername(payload.username()).ifPresent(u -> {
-            throw new AlreadyExsists("L'username esiste già !");
-        });
+        if (payload.email() != f.getEmail()) {
+            this.ur.findByEmail(payload.email()).ifPresent(u -> {
+                throw new AlreadyExsists("La mail è già registrata");
+            });
+        }
+        ;
+        if (payload.username() != f.getUsername()) {
+            this.ur.findByUsername(payload.username()).ifPresent(u -> {
+                throw new AlreadyExsists("L'username esiste già !");
+            });
+        }
+        if (this.ur.count() == 0) f.setRole(Role.ADMIN);
         return this.ur.save(f);
     }
 

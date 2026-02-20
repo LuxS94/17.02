@@ -16,6 +16,8 @@ public class JWTTools {
 
 
     public String generateToken(User user) {
+//        Date now = new Date();
+//        Date expiration = new Date(now.getTime() + Duration.ofDays(30).toMillis());
         return Jwts.builder()
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 30))
@@ -30,6 +32,7 @@ public class JWTTools {
             Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secret.getBytes())).build().parse(token);
 
         } catch (Exception ex) {
+            //   ex.printStackTrace();// x verificare cause se non va token
             throw new UnauthorizedException("Token non valido");
         }
 
